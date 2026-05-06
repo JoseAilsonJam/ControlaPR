@@ -180,26 +180,108 @@ document.addEventListener('click', e => {
   }
 });
 
-// ── Sidebar: preenche dados do usuário ───────
+// ── Sidebar ───────────────────────────────────
 function initSidebar() {
   const user = getUser();
   if (!user) return;
 
-  const el = document.getElementById('sidebarUserName');
-  const em = document.getElementById('sidebarUserEmail');
-  const av = document.getElementById('sidebarAvatar');
-  if (el) el.textContent  = user.name;
-  if (em) em.textContent  = user.email;
-  if (av) av.textContent  = user.name.charAt(0).toUpperCase();
+  _renderSidebarHtml(user);
+  _bindSidebarEvents(user);
+}
 
+function _renderSidebarHtml(user) {
+  const path    = window.location.pathname;
+  const isDash  = path.startsWith('/dashboard');
+  const avatar  = user.name.charAt(0).toUpperCase();
+
+  const aside = document.querySelector('.sidebar');
+  if (aside) {
+    aside.innerHTML = `
+      <div class="sidebar__logo">
+        <h2>Controla<span>PR</span></h2>
+        <p>Gestão de Pull Requests</p>
+      </div>
+      <nav class="sidebar__nav">
+        <a href="/dashboard" ${isDash ? 'class="active"' : ''}>
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="/prs" ${!isDash ? 'class="active"' : ''}>
+          <i class="fa-solid fa-code-branch"></i> Pull Requests
+        </a>
+      </nav>
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="sidebarAvatar">${avatar}</div>
+        <div class="sidebar__user-info">
+          <p id="sidebarUserName">${user.name}</p>
+          <span id="sidebarUserEmail">${user.email}</span>
+        </div>
+        <button class="sidebar__user-edit" id="btnEditProfile" title="Editar perfil">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="sidebar__user-logout" id="btnLogout" title="Sair">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>`;
+  }
+
+  if (!document.getElementById('modalProfile')) {
+    const modal = document.createElement('div');
+    modal.id        = 'modalProfile';
+    modal.className = 'modal-backdrop';
+    modal.innerHTML = `
+      <div class="modal">
+        <div class="modal__header">
+          <h3><i class="fa-solid fa-user-pen" style="color:#b91c1c"></i> Editar perfil</h3>
+          <button class="modal__header-close" onclick="closeModal('modalProfile')">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal__body">
+          <form id="formProfile" novalidate>
+            <div class="form-group">
+              <label for="profileName">Nome <span style="color:#dc2626">*</span></label>
+              <input id="profileName" type="text" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="profileEmail">E-mail <span style="color:#dc2626">*</span></label>
+              <input id="profileEmail" type="email" class="form-control" required>
+            </div>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">
+            <p style="font-size:12px;color:#64748b;margin-bottom:12px">Preencha apenas se quiser alterar a senha</p>
+            <div class="form-group">
+              <label for="profileCurrentPw">Senha atual</label>
+              <input id="profileCurrentPw" type="password" class="form-control" placeholder="Digite a senha atual">
+            </div>
+            <div class="form-group">
+              <label for="profileNewPw">Nova senha</label>
+              <input id="profileNewPw" type="password" class="form-control" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group">
+              <label for="profileConfirmPw">Confirmar nova senha</label>
+              <input id="profileConfirmPw" type="password" class="form-control" placeholder="Repita a nova senha">
+            </div>
+            <div class="modal__footer" style="padding:0;border:none;margin-top:8px">
+              <button type="button" id="btnCancelProfile" class="btn btn--secondary">Cancelar</button>
+              <button type="submit" class="btn btn--primary">
+                <i class="fa-solid fa-check"></i> Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+}
+
+function _bindSidebarEvents() {
   document.getElementById('btnLogout')?.addEventListener('click', () => {
     if (confirm('Deseja sair do sistema?')) logout();
   });
 
   document.getElementById('btnEditProfile')?.addEventListener('click', () => {
     const u = getUser();
-    document.getElementById('profileName').value  = u.name;
-    document.getElementById('profileEmail').value = u.email;
+    document.getElementById('profileName').value      = u.name;
+    document.getElementById('profileEmail').value     = u.email;
     document.getElementById('profileCurrentPw').value = '';
     document.getElementById('profileNewPw').value     = '';
     document.getElementById('profileConfirmPw').value = '';
@@ -208,12 +290,12 @@ function initSidebar() {
 
   document.getElementById('formProfile')?.addEventListener('submit', async e => {
     e.preventDefault();
-    const btn        = e.target.querySelector('button[type=submit]');
-    const name       = document.getElementById('profileName').value.trim();
-    const email      = document.getElementById('profileEmail').value.trim();
-    const currentPw  = document.getElementById('profileCurrentPw').value;
-    const newPw      = document.getElementById('profileNewPw').value;
-    const confirmPw  = document.getElementById('profileConfirmPw').value;
+    const btn       = e.target.querySelector('button[type=submit]');
+    const name      = document.getElementById('profileName').value.trim();
+    const email     = document.getElementById('profileEmail').value.trim();
+    const currentPw = document.getElementById('profileCurrentPw').value;
+    const newPw     = document.getElementById('profileNewPw').value;
+    const confirmPw = document.getElementById('profileConfirmPw').value;
 
     if (!name || !email) { toast('Nome e e-mail são obrigatórios', 'warning'); return; }
     if (newPw && newPw !== confirmPw) { toast('As senhas não coincidem', 'warning'); return; }
@@ -226,10 +308,9 @@ function initSidebar() {
       const data = await api.patch('/auth/profile', body);
       setToken(data.token);
       setUser(data.user);
-      const av2 = document.getElementById('sidebarAvatar');
-      if (document.getElementById('sidebarUserName')) document.getElementById('sidebarUserName').textContent = data.user.name;
-      if (document.getElementById('sidebarUserEmail')) document.getElementById('sidebarUserEmail').textContent = data.user.email;
-      if (av2) av2.textContent = data.user.name.charAt(0).toUpperCase();
+      document.getElementById('sidebarUserName').textContent = data.user.name;
+      document.getElementById('sidebarUserEmail').textContent = data.user.email;
+      document.getElementById('sidebarAvatar').textContent = data.user.name.charAt(0).toUpperCase();
       toast('Perfil atualizado com sucesso!', 'success');
       closeModal('modalProfile');
     } catch (err) {
