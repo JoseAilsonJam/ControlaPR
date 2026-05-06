@@ -38,7 +38,9 @@ function podeAlterarStatus(pr, currentUserId, novoStatus) {
       return [STATUS.PENDENTE, STATUS.COMENTADO, STATUS.APROVADO].includes(novoStatus);
 
     case STATUS.COMENTADO:
-      // Criador corrige; outro usuário não age (precisa de Conferindo)
+      // Conferente pode voltar para Conferindo (clicou errado)
+      if (isCurrentReviewer) return novoStatus === STATUS.CONFERINDO;
+      // Criador corrige
       return isCreator && novoStatus === STATUS.CORRIGIDO;
 
     case STATUS.CORRIGIDO:
@@ -54,6 +56,8 @@ function podeAlterarStatus(pr, currentUserId, novoStatus) {
       return isCreator && novoStatus === STATUS.CORRIGIDO;
 
     case STATUS.APROVADO:
+      // Conferente pode voltar para Conferindo (clicou errado)
+      if (isCurrentReviewer) return novoStatus === STATUS.CONFERINDO;
       return false;
 
     default:
@@ -258,20 +262,36 @@ router.patch('/:id/status', auth, async (req, res) => {
 
     // Atualiza pull_requests com lógica de Conferindo
     if (status === STATUS.CONFERINDO) {
-      // Toma posse da conferência
-      await conn.request()
-        .input('id',          sql.Int,          pr.id)
-        .input('status',      sql.NVarChar(50), STATUS.CONFERINDO)
-        .input('confPor',     sql.Int,          req.user.id)
-        .input('statusAntes', sql.NVarChar(50), pr.status)
-        .query(`
-          UPDATE pull_requests
-          SET status = @status,
-              conferindo_por = @confPor,
-              status_antes_conferindo = @statusAntes,
-              updated_at = GETDATE()
-          WHERE id = @id
-        `);
+      const isUndo = [STATUS.COMENTADO, STATUS.APROVADO].includes(pr.status);
+      if (isUndo) {
+        // Undo: restaura CONFERINDO preservando status_antes_conferindo original
+        await conn.request()
+          .input('id',      sql.Int,          pr.id)
+          .input('status',  sql.NVarChar(50), STATUS.CONFERINDO)
+          .input('confPor', sql.Int,          req.user.id)
+          .query(`
+            UPDATE pull_requests
+            SET status = @status,
+                conferindo_por = @confPor,
+                updated_at = GETDATE()
+            WHERE id = @id
+          `);
+      } else {
+        // Início de nova conferência
+        await conn.request()
+          .input('id',          sql.Int,          pr.id)
+          .input('status',      sql.NVarChar(50), STATUS.CONFERINDO)
+          .input('confPor',     sql.Int,          req.user.id)
+          .input('statusAntes', sql.NVarChar(50), pr.status)
+          .query(`
+            UPDATE pull_requests
+            SET status = @status,
+                conferindo_por = @confPor,
+                status_antes_conferindo = @statusAntes,
+                updated_at = GETDATE()
+            WHERE id = @id
+          `);
+      }
     } else if (status === STATUS.PENDENTE) {
       // Liberar PR: limpa o conferente — qualquer usuário pode assumir
       await conn.request()
@@ -287,14 +307,13 @@ router.patch('/:id/status', auth, async (req, res) => {
         `);
     } else {
       // Comentado, Comentado Novamente, Aprovado, Corrigido:
-      // mantém conferindo_por — o conferente fica bloqueado ao PR
+      // mantém conferindo_por e status_antes_conferindo para possível undo
       await conn.request()
         .input('id',     sql.Int,          pr.id)
         .input('status', sql.NVarChar(50), status)
         .query(`
           UPDATE pull_requests
           SET status = @status,
-              status_antes_conferindo = NULL,
               updated_at = GETDATE()
           WHERE id = @id
         `);

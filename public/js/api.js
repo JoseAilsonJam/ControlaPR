@@ -103,15 +103,24 @@ function getActions(pr, currentUserId) {
         if (pr.status_antes_conferindo === 'Corrigido') {
           actions.push({ status: 'Comentado Novamente', label: 'Comentar Novamente', cls: 'btn--purple', needsComment: true });
         } else {
-          actions.push({ status: 'Comentado', label: 'Comentar', cls: 'btn--warning', needsComment: true });
+          actions.push({ status: 'Comentado', label: 'Comentar', cls: 'btn--warning', needsComment: false });
         }
         actions.push({ status: 'Aprovado', label: 'Aprovar', cls: 'btn--success', needsComment: false });
       }
       break;
 
     case 'Comentado':
+      if (isCurrentReviewer) {
+        actions.push({ status: 'Conferindo', label: 'Voltar para Conferindo', cls: 'btn--secondary', needsComment: false });
+      }
       if (isCreator) {
         actions.push({ status: 'Corrigido', label: 'Marcar como Corrigido', cls: 'btn--primary', needsComment: false });
+      }
+      break;
+
+    case 'Aprovado':
+      if (isCurrentReviewer) {
+        actions.push({ status: 'Conferindo', label: 'Voltar para Conferindo', cls: 'btn--secondary', needsComment: false });
       }
       break;
 
@@ -186,4 +195,50 @@ function initSidebar() {
   document.getElementById('btnLogout')?.addEventListener('click', () => {
     if (confirm('Deseja sair do sistema?')) logout();
   });
+
+  document.getElementById('btnEditProfile')?.addEventListener('click', () => {
+    const u = getUser();
+    document.getElementById('profileName').value  = u.name;
+    document.getElementById('profileEmail').value = u.email;
+    document.getElementById('profileCurrentPw').value = '';
+    document.getElementById('profileNewPw').value     = '';
+    document.getElementById('profileConfirmPw').value = '';
+    openModal('modalProfile');
+  });
+
+  document.getElementById('formProfile')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn        = e.target.querySelector('button[type=submit]');
+    const name       = document.getElementById('profileName').value.trim();
+    const email      = document.getElementById('profileEmail').value.trim();
+    const currentPw  = document.getElementById('profileCurrentPw').value;
+    const newPw      = document.getElementById('profileNewPw').value;
+    const confirmPw  = document.getElementById('profileConfirmPw').value;
+
+    if (!name || !email) { toast('Nome e e-mail são obrigatórios', 'warning'); return; }
+    if (newPw && newPw !== confirmPw) { toast('As senhas não coincidem', 'warning'); return; }
+
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span> Salvando...';
+    try {
+      const body = { name, email };
+      if (newPw) { body.currentPassword = currentPw; body.newPassword = newPw; }
+      const data = await api.patch('/auth/profile', body);
+      setToken(data.token);
+      setUser(data.user);
+      const av2 = document.getElementById('sidebarAvatar');
+      if (document.getElementById('sidebarUserName')) document.getElementById('sidebarUserName').textContent = data.user.name;
+      if (document.getElementById('sidebarUserEmail')) document.getElementById('sidebarUserEmail').textContent = data.user.email;
+      if (av2) av2.textContent = data.user.name.charAt(0).toUpperCase();
+      toast('Perfil atualizado com sucesso!', 'success');
+      closeModal('modalProfile');
+    } catch (err) {
+      toast(err.message, 'error');
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvar';
+    }
+  });
+
+  document.getElementById('btnCancelProfile')?.addEventListener('click', () => closeModal('modalProfile'));
 }

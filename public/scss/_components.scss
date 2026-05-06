@@ -74,6 +74,13 @@
       span { font-size: 11px; color: $gray-400; }
     }
 
+    &-edit {
+      background: none; border: none; color: $gray-400;
+      cursor: pointer; font-size: 13px; padding: $s1;
+      transition: color $trans;
+      &:hover { color: $white; }
+    }
+
     &-logout {
       background: none; border: none; color: $gray-400;
       cursor: pointer; font-size: 14px; padding: $s1;
