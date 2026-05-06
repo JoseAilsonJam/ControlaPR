@@ -1,0 +1,61 @@
+// ──────────────────────────────────────────────
+// Cores principais — tema cinza e vermelho
+// ──────────────────────────────────────────────
+$primary:      #b91c1c;  // vermelho principal
+$primary-dark: #991b1b;  // vermelho escuro (hover)
+$success:      #374151;  // cinza escuro (aprovado / mensagem positiva)
+$warning:      #92400e;  // âmbar escuro
+$danger:       #ef4444;  // vermelho claro (erros de formulário)
+$info:         #6b7280;  // cinza médio
+
+// Cores por status
+$color-pendente:    #9ca3af;  // cinza claro  — aguardando
+$color-conferindo:  #4b5563;  // cinza médio  — em análise
+$color-comentado:   #b91c1c;  // vermelho     — tem apontamentos
+$color-aprovado:    #1f2937;  // cinza escuro — estado final
+$color-corrigido:   #6b7280;  // cinza        — corrigido, aguardando
+$color-coment-nov:  #7f1d1d;  // vermelho escuro — apontamentos recorrentes
+
+// Neutros (escala cinza puro, sem matiz azulado)
+$white:      #ffffff;
+$gray-50:    #f9fafb;
+$gray-100:   #f3f4f6;
+$gray-200:   #e5e7eb;
+$gray-300:   #d1d5db;
+$gray-400:   #9ca3af;
+$gray-500:   #6b7280;
+$gray-600:   #4b5563;
+$gray-700:   #374151;
+$gray-800:   #1f2937;
+$gray-900:   #111827;
+
+// Tipografia
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-size:   14px;
+
+// Espaçamento
+$s1: 4px;
+$s2: 8px;
+$s3: 12px;
+$s4: 16px;
+$s5: 20px;
+$s6: 24px;
+$s8: 32px;
+$s10: 40px;
+$s12: 48px;
+
+// Borda
+$radius:    8px;
+$radius-sm: 4px;
+$radius-lg: 12px;
+$border:    $gray-200;
+
+// Sombras
+$shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+$shadow:    0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+$shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+$shadow-lg: 0 10px 15px rgba(0,0,0,.10), 0 4px 6px rgba(0,0,0,.05);
+
+// Layout
+$sidebar-width: 240px;
+$trans:         .18s ease;

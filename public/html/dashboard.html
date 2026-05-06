@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ControlaPR — Dashboard</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <h2>Controla<span>PR</span></h2>
+        <p>Gestão de Pull Requests</p>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="/dashboard" class="active">
+          <i class="fa-solid fa-gauge-high"></i>
+          Dashboard
+        </a>
+        <a href="/prs">
+          <i class="fa-solid fa-code-branch"></i>
+          Pull Requests
+        </a>
+      </nav>
+
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar__user-info">
+          <p id="sidebarUserName">Carregando...</p>
+          <span id="sidebarUserEmail"></span>
+        </div>
+        <button class="sidebar__user-logout" id="btnLogout" title="Sair">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ══════════════ CONTEÚDO ══════════════ -->
+    <main class="main-content">
+      <header class="page-header">
+        <div class="page-header__left">
+          <h1><i class="fa-solid fa-gauge-high" style="color:#b91c1c;margin-right:8px"></i>Dashboard</h1>
+          <p>Visão geral do andamento dos Pull Requests</p>
+        </div>
+        <a href="/prs" class="btn btn--primary">
+          <i class="fa-solid fa-code-branch"></i> Ver PRs
+        </a>
+      </header>
+
+      <div class="page-content">
+
+        <!-- Alertas dinâmicos -->
+        <div id="alertsContainer"></div>
+
+        <!-- Cards de estatísticas -->
+        <div id="statsGrid" class="stats-grid">
+          <!-- preenchido via JS -->
+          <div class="stat-card" style="opacity:.4">
+            <div class="stat-card__icon" style="background:#f1f5f9"><span class="spinner"></span></div>
+            <div class="stat-card__info"><p>Carregando...</p><h3>—</h3></div>
+          </div>
+        </div>
+
+        <!-- Grid: atividade recente -->
+        <div class="card">
+          <div class="card__header">
+            <h3><i class="fa-solid fa-timeline" style="color:#b91c1c;margin-right:6px"></i>Atividade recente</h3>
+            <a href="/prs" class="btn btn--ghost btn--sm">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <div class="card__body">
+            <div id="activityList">
+              <div style="text-align:center;padding:32px;color:#94a3b8"><span class="spinner"></span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ControlaPR — Pull Requests</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+
+    <!-- ══════════════ SIDEBAR ══════════════ -->
+    <aside class="sidebar">
+      <div class="sidebar__logo">
+        <h2>Controla<span>PR</span></h2>
+        <p>Gestão de Pull Requests</p>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="/dashboard">
+          <i class="fa-solid fa-gauge-high"></i>
+          Dashboard
+        </a>
+        <a href="/prs" class="active">
+          <i class="fa-solid fa-code-branch"></i>
+          Pull Requests
+        </a>
+      </nav>
+
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar__user-info">
+          <p id="sidebarUserName">Carregando...</p>
+          <span id="sidebarUserEmail"></span>
+        </div>
+        <button class="sidebar__user-logout" id="btnLogout" title="Sair">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ══════════════ CONTEÚDO ══════════════ -->
+    <main class="main-content">
+      <header class="page-header">
+        <div class="page-header__left">
+          <h1><i class="fa-solid fa-code-branch" style="color:#b91c1c;margin-right:8px"></i>Pull Requests</h1>
+          <p>Gerencie e acompanhe o status dos seus PRs</p>
+        </div>
+        <button id="btnNewPR" class="btn btn--primary">
+          <i class="fa-solid fa-plus"></i> Novo PR
+        </button>
+      </header>
+
+      <div class="page-content">
+
+        <!-- Pesquisa e filtros -->
+        <div class="search-bar">
+          <div style="position:relative;flex:1">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:13px;pointer-events:none"></i>
+            <input id="searchInput" type="text" class="form-control" placeholder="Buscar por título, URL ou autor..." style="padding-left:32px">
+          </div>
+        </div>
+
+        <!-- Botões de filtro por status -->
+        <div id="filterButtons" class="filters"></div>
+
+        <!-- Tabela de PRs -->
+        <div class="card">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>PR</th>
+                  <th>Status</th>
+                  <th>Autor</th>
+                  <th>Conferente</th>
+                  <th>Criado em</th>
+                  <th>Atualizado</th>
+                  <th>Ações rápidas</th>
+                </tr>
+              </thead>
+              <tbody id="prTableBody">
+                <tr>
+                  <td colspan="7" style="text-align:center;padding:40px;color:#94a3b8">
+                    <span class="spinner"></span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ══════════════ MODAL: NOVO PR ══════════════ -->
+  <div id="modalNewPR" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal__header">
+        <h3><i class="fa-solid fa-plus" style="color:#b91c1c"></i> Cadastrar novo PR</h3>
+        <button class="modal__header-close" onclick="closeModal('modalNewPR')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal__body">
+        <form id="formNewPR" novalidate>
+          <div class="form-group">
+            <label for="prUrl">URL do Pull Request <span style="color:#dc2626">*</span></label>
+            <input id="prUrl" type="url" class="form-control" placeholder="https://github.com/org/repo/pull/123" required>
+            <p class="hint">Cole o link completo do PR no GitHub, GitLab ou Bitbucket</p>
+          </div>
+          <div class="form-group">
+            <label for="prTitle">Título (opcional)</label>
+            <input id="prTitle" type="text" class="form-control" placeholder="Ex: feat: adiciona autenticação OAuth">
+          </div>
+          <div class="form-group">
+            <label for="prDescription">Descrição (opcional)</label>
+            <textarea id="prDescription" class="form-control" rows="3" placeholder="Contexto sobre o PR, o que foi alterado..."></textarea>
+          </div>
+          <div class="modal__footer" style="padding:0;border:none;margin-top:8px">
+            <button type="button" id="btnCancelNewPR" class="btn btn--secondary">Cancelar</button>
+            <button type="submit" class="btn btn--primary">
+              <i class="fa-solid fa-plus"></i> Cadastrar PR
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: DETALHE DO PR ══════════════ -->
+  <div id="modalDetail" class="modal-backdrop">
+    <div class="modal modal--wide">
+      <div class="modal__header">
+        <h3><i class="fa-solid fa-code-branch" style="color:#b91c1c"></i> Detalhe do PR</h3>
+        <button class="modal__header-close" id="btnCloseDetail">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal__body" id="modalDetailBody">
+        <div style="text-align:center;padding:40px"><span class="spinner"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ MODAL: ALTERAR STATUS ══════════════ -->
+  <div id="modalStatus" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 id="statusModalTitle">Alterar status</h3>
+        <button class="modal__header-close" onclick="closeModal('modalStatus')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal__body">
+        <form id="formStatus" novalidate>
+          <p style="font-size:13px;color:#475569;margin-bottom:16px">
+            O status do PR será alterado para:
+            <span id="statusModalNewStatus" style="margin-left:4px"></span>
+          </p>
+
+          <div id="commentGroup" class="form-group" style="display:none">
+            <label id="commentLabel" for="statusComment">Comentário</label>
+            <textarea id="statusComment" class="form-control" rows="4" placeholder="Descreva o que foi observado ou corrigido..."></textarea>
+          </div>
+
+          <div class="modal__footer" style="padding:0;border:none;margin-top:8px">
+            <button type="button" id="btnCancelStatus" class="btn btn--secondary">Cancelar</button>
+            <button type="submit" class="btn btn--primary">
+              <i class="fa-solid fa-check"></i> Confirmar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/prs.js"></script>
+</body>
+</html>
