@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!requireAuth()) return;
   initSidebar();
   await loadDashboard();
+
+  // Atualiza o dashboard automaticamente quando qualquer PR mudar
+  initRealtime(async () => {
+    await loadDashboard();
+  });
 });
 
 async function loadDashboard() {

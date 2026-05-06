@@ -49,9 +49,16 @@
           <h1><i class="fa-solid fa-gauge-high" style="color:#b91c1c;margin-right:8px"></i>Dashboard</h1>
           <p>Visão geral do andamento dos Pull Requests</p>
         </div>
-        <a href="/prs" class="btn btn--primary">
-          <i class="fa-solid fa-code-branch"></i> Ver PRs
-        </a>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span id="realtimeStatus"
+            style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#6b7280;white-space:nowrap">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size:8px;color:#9ca3af"></i>
+            <span>Conectando...</span>
+          </span>
+          <a href="/prs" class="btn btn--primary">
+            <i class="fa-solid fa-code-branch"></i> Ver PRs
+          </a>
+        </div>
       </header>
 
       <div class="page-content">
@@ -89,6 +96,7 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="/js/api.js"></script>
+  <script src="/js/realtime.js"></script>
   <script src="/js/dashboard.js"></script>
 </body>
 </html>

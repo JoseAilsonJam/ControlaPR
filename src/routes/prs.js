@@ -1,6 +1,7 @@
 const express = require('express');
 const { getConnection, sql } = require('../config/database');
 const auth = require('../middleware/auth');
+const { broadcast } = require('./events');
 
 const router = express.Router();
 
@@ -206,6 +207,13 @@ router.post('/', auth, async (req, res) => {
       prIdLabel: pr.id,
     });
 
+    broadcast('pr_criado', {
+      id:          pr.id,
+      status:      STATUS.PENDENTE,
+      changedBy:   req.user.name,
+      changedById: req.user.id,
+    });
+
     res.status(201).json(pr);
   } catch (err) {
     console.error(err);
@@ -316,6 +324,14 @@ router.patch('/:id/status', auth, async (req, res) => {
       prIdLabel: pr.id,
     });
 
+    broadcast('pr_atualizado', {
+      id:          pr.id,
+      status,
+      oldStatus,
+      changedBy:   req.user.name,
+      changedById: req.user.id,
+    });
+
     res.json({ message: 'Status atualizado com sucesso', status });
   } catch (err) {
     console.error(err);
@@ -370,6 +386,13 @@ router.patch('/:id/url', auth, async (req, res) => {
       oldValue:  oldUrl,
       newValue:  newUrl,
       prIdLabel: pr.id,
+    });
+
+    broadcast('pr_atualizado', {
+      id:          pr.id,
+      urlAlterada: true,
+      changedBy:   req.user.name,
+      changedById: req.user.id,
     });
 
     res.json({ message: 'URL atualizada com sucesso' });

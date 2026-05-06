@@ -596,6 +596,14 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+// Flash em linha atualizada em tempo real
+.row-flash td { animation: rowFlash 1.8s ease forwards; }
+
+@keyframes rowFlash {
+  0%   { background-color: rgba($primary, .10); }
+  100% { background-color: transparent; }
+}
+
 // ══════════════════════════════════════════════════════
 // DETALHE DO PR
 // ══════════════════════════════════════════════════════

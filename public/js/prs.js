@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSidebar();
   bindEvents();
   await loadPRs();
+
+  // Atualiza a lista automaticamente quando qualquer PR mudar
+  initRealtime(async (data) => {
+    await loadPRs(data.id);
+  });
 });
 
 // ── Eventos ───────────────────────────────────
@@ -91,16 +96,41 @@ function bindEvents() {
 }
 
 // ── Carregar PRs ──────────────────────────────
-async function loadPRs() {
+let _carregando = false;
+
+async function loadPRs(highlightId = null) {
+  if (_carregando) return; // evita requisições simultâneas
+  _carregando = true;
+
   const tbody = document.getElementById('prTableBody');
-  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:#94a3b8"><span class="spinner"></span></td></tr>`;
+
+  // Spinner apenas no carregamento inicial
+  if (allPRs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:#94a3b8"><span class="spinner"></span></td></tr>`;
+  }
+
   try {
     allPRs = await api.get('/prs');
     renderFilters();
     renderTable();
+
+    // Flash na linha do PR alterado
+    if (highlightId) {
+      setTimeout(() => {
+        const row = tbody.querySelector(`tr[data-id="${highlightId}"]`);
+        if (row) {
+          row.classList.add('row-flash');
+          row.addEventListener('animationend', () => row.classList.remove('row-flash'), { once: true });
+        }
+      }, 60);
+    }
   } catch (err) {
     toast('Erro ao carregar PRs: ' + err.message, 'error');
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:#dc2626">Erro ao carregar dados</td></tr>`;
+    if (allPRs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:#dc2626">Erro ao carregar dados</td></tr>`;
+    }
+  } finally {
+    _carregando = false;
   }
 }
 
@@ -117,7 +147,7 @@ function renderFilters() {
   ];
   const container = document.getElementById('filterButtons');
   container.innerHTML = statusList.map(s => {
-    const count = s === 'Todos' ? allPRs.length : allPRs.filter(p => p.status === s).length;
+    const count = s === 'Todos' ? allPRs.filter(p => p.status !== 'Aprovado').length : allPRs.filter(p => p.status === s).length;
     return `<button class="filter-btn ${filterStatus === s ? 'active' : ''}" data-status="${s}">
       ${s} <span style="opacity:.6">(${count})</span>
     </button>`;
@@ -138,7 +168,7 @@ function renderTable() {
   const tbody = document.getElementById('prTableBody');
   const user  = getUser();
 
-  let filtered = filterStatus === 'Todos' ? [...allPRs] : allPRs.filter(p => p.status === filterStatus);
+  let filtered = filterStatus === 'Todos' ? allPRs.filter(p => p.status !== 'Aprovado') : allPRs.filter(p => p.status === filterStatus);
 
   if (searchTerm) {
     filtered = filtered.filter(p =>

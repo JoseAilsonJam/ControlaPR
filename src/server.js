@@ -5,9 +5,10 @@ const fs = require('fs');
 const sass = require('sass');
 require('dotenv').config();
 
-const authRoutes      = require('./routes/auth');
-const prsRoutes       = require('./routes/prs');
-const dashboardRoutes = require('./routes/dashboard');
+const authRoutes         = require('./routes/auth');
+const prsRoutes          = require('./routes/prs');
+const dashboardRoutes    = require('./routes/dashboard');
+const { router: eventsRouter } = require('./routes/events');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +40,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/auth',      authRoutes);
 app.use('/api/prs',       prsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/events',    eventsRouter);
 
 // Páginas HTML
 app.get('/',          (_, res) => res.sendFile(path.join(__dirname, '../public/html/login.html')));

@@ -49,9 +49,16 @@
           <h1><i class="fa-solid fa-code-branch" style="color:#b91c1c;margin-right:8px"></i>Pull Requests</h1>
           <p>Gerencie e acompanhe o status dos seus PRs</p>
         </div>
-        <button id="btnNewPR" class="btn btn--primary">
-          <i class="fa-solid fa-plus"></i> Novo PR
-        </button>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span id="realtimeStatus"
+            style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#6b7280;white-space:nowrap">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size:8px;color:#9ca3af"></i>
+            <span>Conectando...</span>
+          </span>
+          <button id="btnNewPR" class="btn btn--primary">
+            <i class="fa-solid fa-plus"></i> Novo PR
+          </button>
+        </div>
       </header>
 
       <div class="page-content">
@@ -183,6 +190,7 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="/js/api.js"></script>
+  <script src="/js/realtime.js"></script>
   <script src="/js/prs.js"></script>
 </body>
 </html>
