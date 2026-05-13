@@ -39,7 +39,12 @@
             </div>
             <div class="form-group">
               <label for="loginPassword">Senha</label>
-              <input id="loginPassword" type="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+              <div class="input-pw">
+                <input id="loginPassword" type="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                <button type="button" class="input-pw__toggle" tabindex="-1" aria-label="Mostrar senha">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
             </div>
             <p id="loginError" class="form-error" style="display:none"></p>
             <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-top:4px">
@@ -61,11 +66,21 @@
             </div>
             <div class="form-group">
               <label for="registerPassword">Senha</label>
-              <input id="registerPassword" type="password" class="form-control" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+              <div class="input-pw">
+                <input id="registerPassword" type="password" class="form-control" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+                <button type="button" class="input-pw__toggle" tabindex="-1" aria-label="Mostrar senha">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
             </div>
             <div class="form-group">
               <label for="registerConfirm">Confirmar senha</label>
-              <input id="registerConfirm" type="password" class="form-control" placeholder="Repita a senha" required autocomplete="new-password">
+              <div class="input-pw">
+                <input id="registerConfirm" type="password" class="form-control" placeholder="Repita a senha" required autocomplete="new-password">
+                <button type="button" class="input-pw__toggle" tabindex="-1" aria-label="Mostrar senha">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
             </div>
             <p id="registerError" class="form-error" style="display:none"></p>
             <button type="submit" class="btn btn--primary btn--full btn--lg" style="margin-top:4px">

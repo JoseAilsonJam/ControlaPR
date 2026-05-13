@@ -210,14 +210,13 @@ function _renderSidebarHtml(user) {
         </a>
       </nav>
       <div class="sidebar__user">
-        <div class="sidebar__user-avatar" id="sidebarAvatar">${avatar}</div>
+        <button class="sidebar__user-edit" id="btnEditProfile" title="Editar perfil">
+          <div class="sidebar__user-avatar" id="sidebarAvatar">${avatar}</div>
+        </button>
         <div class="sidebar__user-info">
           <p id="sidebarUserName">${user.name}</p>
           <span id="sidebarUserEmail">${user.email}</span>
         </div>
-        <button class="sidebar__user-edit" id="btnEditProfile" title="Editar perfil">
-          <i class="fa-solid fa-pen"></i>
-        </button>
         <button class="sidebar__user-logout" id="btnLogout" title="Sair">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </button>

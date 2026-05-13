@@ -53,11 +53,11 @@
   }
 
   &__user {
-    padding: $s4 $s5;
+    padding: 16px 10px;
     border-top: 1px solid rgba(255,255,255,.08);
     display: flex;
     align-items: center;
-    gap: $s3;
+    gap: 3px;
 
     &-avatar {
       width: 34px; height: 34px;
@@ -306,6 +306,19 @@
 }
 
 textarea.form-control { resize: vertical; min-height: 80px; }
+
+.input-pw {
+  position: relative;
+  .form-control { padding-right: 38px; }
+  &__toggle {
+    position: absolute;
+    right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; padding: 2px;
+    color: $gray-400; cursor: pointer; font-size: 13px;
+    transition: color $trans;
+    &:hover { color: $gray-600; }
+  }
+}
 
 .form-error { font-size: 12px; color: $danger; margin-top: 4px; }
 

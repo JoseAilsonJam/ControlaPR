@@ -9,6 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // ── Toggle mostrar/ocultar senha ──────────
+  document.querySelectorAll('.input-pw__toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.closest('.input-pw').querySelector('input');
+      const show  = input.type === 'password';
+      input.type  = show ? 'text' : 'password';
+      btn.querySelector('i').className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+  });
+
   // ── Tabs ──────────────────────────────────
   const tabs    = document.querySelectorAll('.auth-tab');
   const panels  = document.querySelectorAll('.tab-panel');
